@@ -1,0 +1,23 @@
+# 忽略大型数据文件
+*.h5
+*.npz
+*.jsonl
+*.dat
+
+# 忽略检查点文件夹内容，但保留文件夹结构
+checkpoints/*
+!checkpoints/.gitkeep
+
+# 忽略Python缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 忽略临时文件和输出目录
+output*/
+temp*/
+results/
+
+# 忽略系统文件
+.DS_Store
+Thumbs.db
