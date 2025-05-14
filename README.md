@@ -35,7 +35,7 @@ The dataset, consisting of airfoil geometries paired with descriptive texts (enc
 Due to their size, these files are not included in this GitHub repository.
 
 You can download them from the following cloud drive link:
-`[Download Dataset and Checkpoints](YOUR_CLOUD_DRIVE_LINK_HERE)`
+`[Download Dataset and Checkpoints](https://drive.google.com/drive/folders/1E-7Ij_97sj3TZI4y12QCL1BnTF8vSZzx?usp=drive_link)`
 
 Please place the dataset files in the `dataset/` directory (or update paths in configurations) and checkpoints in the `checkpoints/` directory (or as specified by the scripts).
 
