@@ -68,7 +68,3 @@ If you use FoilCLIP in your research, please cite our work.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-We acknowledge the support from [Your Institution/Organization] and the contributions of the open-source community.
