@@ -422,15 +422,17 @@ def plot_enriched_airfoils(n_samples=5, sigma=2.0,
     plt.tight_layout()
     plt.show()
 
-def generate_variants_for_sample(vae, sample, num_variants=5, noise_std=0.1):
+def generate_variants_for_sample(vae, sample, num_variants=5, std_scale_factor=1.0):
     """
     利用训练好的 VAE 为给定翼型生成多个变种。
+    变种是通过在潜空间中围绕给定样本的均值，根据模型学习到的方差进行采样生成的。
+    可以通过 std_scale_factor 调整采样时的标准差大小。
 
     参数:
         vae: 训练好的 VAE 模型
         sample: 给定翼型的 CST 参数（Tensor，形状为 [1, cst_dim]）
         num_variants: 要生成的变种数量
-        noise_std: 在潜空间中添加噪声的标准差
+        std_scale_factor: 标准差缩放因子。大于1增加多样性，小于1减少多样性，默认为1。
 
     返回:
         variants: 生成的翼型参数变种列表，每个元素形状为 [1, cst_dim]
@@ -443,11 +445,16 @@ def generate_variants_for_sample(vae, sample, num_variants=5, noise_std=0.1):
         # 编码得到潜空间表示
         encoded = vae.encoder(sample)
         mu = vae.fc_mu(encoded)
-        # 使用 mu 作为基础，在其上添加噪声生成变种
+        logvar = vae.fc_logvar(encoded)
+        
+        std = torch.exp(0.5 * logvar)
+        scaled_std = std * std_scale_factor # 应用缩放因子
+        
         variants = []
         for _ in range(num_variants):
-            noise = torch.randn_like(mu) * noise_std
-            z_variant = mu + noise
+            # 手动实现 reparameterize，以便使用 scaled_std
+            eps = torch.randn_like(scaled_std)
+            z_variant = mu + eps * scaled_std
             decoder_in = vae.decoder_input(z_variant)
             variant_params = vae.decoder(decoder_in)
             variants.append(variant_params)
@@ -461,7 +468,7 @@ def plot_airfoil_variants(sample, variants, title="Original and Variants"):
     plt.figure(figsize=(10, 4))
     
     # Load data to get parameter dimensions
-    data = np.load("CLIP_finale/train_dataset/airfoil_enhanced_cst.npz")
+    data = np.load("./dataset/airfoil_enhanced_cst.npz")
     base_u = data["base_u"].astype("float32")
     base_l = data["base_l"].astype("float32")
     le_u = data["le_u"].astype("float32")
@@ -568,10 +575,10 @@ def plot_airfoil_variants(sample, variants, title="Original and Variants"):
     plt.tight_layout()
     plt.show()
 
-def sample(num_variants=5, noise_std=0.15):
+def sample(num_variants=5, std_scale_factor=1.0):
     # 配置
-    data_file = "CLIP_finale/train_dataset/airfoil_enhanced_cst.npz"
-    checkpoint_path = "CLIP_finale/vae_checkpoints/enhanced_beta0.0001_best.pth"
+    data_file = "./dataset/airfoil_enhanced_cst.npz"
+    checkpoint_path = "./vae_checkpoints/enhanced_beta0.0001_best.pth"
     
     # 检查文件是否存在
     if not os.path.exists(data_file):
@@ -605,10 +612,10 @@ def sample(num_variants=5, noise_std=0.15):
     vae = vae.to(device)
 
     # 生成变种
-    variants = generate_variants_for_sample(vae, sample, num_variants=num_variants, noise_std=noise_std)
+    variants = generate_variants_for_sample(vae, sample, num_variants=num_variants, std_scale_factor=std_scale_factor)
 
     # 绘制原始翼型及其变种
-    plot_airfoil_variants(sample_np, variants, title=f"Airfoil with Variants")
+    plot_airfoil_variants(sample_np, variants, title=f"Airfoil with Variants (std_scale={std_scale_factor})")
 
 if __name__ == "__main__":
     # 使用增强的CST数据集训练
@@ -617,4 +624,4 @@ if __name__ == "__main__":
     #train(beta1=0.0001)
     #plot_airfoils(n_samples=10, sigma=1, checkpoint_path="vae_checkpoints/enhanced_beta0.0001_best.pth")
     #plot_enriched_airfoils(n_samples=10, sigma=2, checkpoint_path="vae_checkpoints/best_0.01.pth")
-    sample(num_variants=5, noise_std=0.15)
+    sample(num_variants=10, std_scale_factor=3) # 示例：增加标准差缩放因子以获取更多样结果
