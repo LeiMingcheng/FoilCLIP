@@ -505,20 +505,20 @@ def visualize_enhanced_cst_fit(xu: np.ndarray, yu: np.ndarray, xl: np.ndarray, y
     axs[1].set_ylabel('y/c', fontsize=12)
     axs[1].grid(True, linestyle='--', alpha=0.5)
     axs[1].legend(loc='best', fontsize=10, framealpha=0.7)
-    axs[1].set_aspect('equal')
+    #axs[1].set_aspect('equal')
 
     # 添加坐标轴
     axs[1].axhline(y=0, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
     axs[1].axvline(x=0, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
 
     # 为高精度对比图创建一个新的图形
-    plt.figure(figsize=(10, 6), dpi=150)
+    plt.figure(figsize=(10, 8), dpi=150)
 
     # 前缘区域范围
-    le_range = 0.06
+    le_range = 0.015
 
     # 生成高精度曲线点
-    nn_smooth = 301
+    nn_smooth = 4001
     x_smooth, yu_base_smooth = cst_curve(nn_smooth, cst_base_u)
     x_smooth, yl_base_smooth = cst_curve(nn_smooth, cst_base_l)
 
@@ -551,15 +551,15 @@ def visualize_enhanced_cst_fit(xu: np.ndarray, yu: np.ndarray, xl: np.ndarray, y
 
     # 绘制平滑曲线 - 基础拟合用蓝色实线
     plt.plot(x_smooth[x_smooth <= le_range], yu_base_smooth[x_smooth <= le_range], '-', 
-           color=colors['base_fit'], linewidth=2.0, label='Base CST Fit')
+           color=colors['base_fit'], linewidth=1.8, label='Base CST Fit')
     plt.plot(x_smooth[x_smooth <= le_range], yl_base_smooth[x_smooth <= le_range], '-', 
-           color=colors['base_fit'], linewidth=2.0)
+           color=colors['base_fit'], linewidth=1.8)
 
     # 绘制平滑曲线 - 增强拟合用红色虚线
     plt.plot(x_smooth[x_smooth <= le_range], yu_final_smooth[x_smooth <= le_range], '--', 
-           color=colors['enhanced_fit'], linewidth=2.0, label='Enhanced CST Fit')
+           color=colors['enhanced_fit'], linewidth=1.8, label='Enhanced CST Fit')
     plt.plot(x_smooth[x_smooth <= le_range], yl_final_smooth[x_smooth <= le_range], '--', 
-           color=colors['enhanced_fit'], linewidth=2.0)
+           color=colors['enhanced_fit'], linewidth=1.8)
 
     # 设置标题和坐标轴
     plt.title('Leading Edge: Base CST vs Enhanced CST', fontsize=14, fontweight='bold')
@@ -569,7 +569,7 @@ def visualize_enhanced_cst_fit(xu: np.ndarray, yu: np.ndarray, xl: np.ndarray, y
     plt.yticks(fontsize=14)
     plt.grid(True, linestyle='--', alpha=0.4)
     plt.legend(loc='best', fontsize=13, framealpha=0.7)
-    plt.gca().set_aspect('equal')
+    #plt.gca().set_aspect('equal')
 
     # 添加坐标轴
     plt.axhline(y=0, color='k', linestyle='-', linewidth=0.5, alpha=0.3)
